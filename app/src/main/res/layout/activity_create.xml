@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateActivity"
+    tools:ignore="ExtraText">
+
+
+    <EditText
+        android:id="@+id/textDesc"
+        android:layout_width="370dp"
+        android:layout_height="200dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="78dp"
+        android:background="#EDE8E8"
+        android:cursorVisible="true"
+        android:gravity="start"
+        android:hint="Add your Content"
+        android:inputType="textMultiLine|textNoSuggestions|textCapSentences|textAutoCorrect"
+        android:padding="10dp"
+        android:textColor="#000"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="33dp"
+        android:text="TITLE : "
+        android:textColor="#000000"
+        android:textSize="25dp" />
+
+    <EditText
+        android:id="@+id/enterTitle"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="33dp"
+        android:hint="Enter the title"
+        android:maxLines="1"/>
+
+    <TextView
+        android:id="@+id/topics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="316dp"
+        android:layout_marginBottom="303dp"
+        android:text="Select a Tag "
+        android:textColor="#000000"
+        android:textSize="12dp" />
+
+    <Spinner
+        android:layout_width="130dp"
+        android:layout_height="45dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="23dp"
+        android:layout_marginBottom="263dp"
+        android:id="@+id/spinnerForTags"/>
+
+    <TextView
+        android:id="@+id/attachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="27dp"
+        android:layout_marginBottom="304dp"
+        android:text="Select the Attachment "
+        android:textColor="#000000"
+        android:textSize="12dp" />
+
+    <Spinner
+        android:id="@+id/spinnerForAttach"
+        android:layout_width="130dp"
+        android:layout_height="45dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="21dp"
+        android:layout_marginBottom="256dp" />
+
+    <Button
+        android:id="@+id/attach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="304dp"
+        android:layout_marginEnd="24dp"
+        android:text="ATTACH" />
+
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="189dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="104dp"
+        android:layout_marginBottom="60dp"
+        android:text="SUBMIT" />
+
+</RelativeLayout>

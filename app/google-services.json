@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "182624032749",
+    "firebase_url": "https://andy-a216f.firebaseio.com",
+    "project_id": "andy-a216f",
+    "storage_bucket": "andy-a216f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:182624032749:android:771e0573f94ecb4969f9e4",
+        "android_client_info": {
+          "package_name": "com.andy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "182624032749-r4i83ta2njs8l85htsavopff2flg4gon.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andy",
+            "certificate_hash": "6e43bf7fe760c9a85a7aaa7845ebc92043be0507"
+          }
+        },
+        {
+          "client_id": "182624032749-0mbnlgjlflhuq7oim8tgc8fs7o9ad5lc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKELHR35OvQ57IYU942c1lsAZ_8qTN5bE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "182624032749-0mbnlgjlflhuq7oim8tgc8fs7o9ad5lc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
