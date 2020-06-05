@@ -52,14 +52,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        doThis();
+        if (tagSet.isEmpty()){
+            loadFragment(new SearchFragment());
+        }
         //loading the default fragment
-        loadFragment(new FeedsFragment());
+        else {
+            loadFragment(new FeedsFragment());
+        }
 
         //getting bottom navigation view and attaching the listener
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
-        doThis();
+
 
     }
 
