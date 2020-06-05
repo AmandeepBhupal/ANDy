@@ -121,7 +121,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:theme="@style/Theme.MaterialComponents.Light"
-                        app:chipSpacingVertical="2dp" />
+                        app:chipSpacingVertical="2dp"  />
 
                     <View
                         android:layout_width="match_parent"
