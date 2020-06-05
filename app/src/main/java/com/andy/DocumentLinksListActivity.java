@@ -15,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DocumentLinksListActivity extends AppCompatActivity {
 
@@ -46,13 +47,21 @@ public class DocumentLinksListActivity extends AppCompatActivity {
                     if (dataSnapshot.exists()) {
                         documentLinkArrayList = new ArrayList<>();
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            DocumentLink documentLink = new DocumentLink(ds.getKey(), ds.getValue(String.class));
+                            HashMap<String, String> map = (HashMap<String, String>) ds.getValue();
+                            DocumentLink documentLink = new DocumentLink(
+                                map.get("title"),
+                                map.get("url"),
+                                map.get("desc"),
+                                map.get("timestamp"));
+
                             documentLinkArrayList.add(documentLink);
+
+                            }
                         }
                         DocumentLinkAdapter documentLinkAdapter = new DocumentLinkAdapter(documentLinkArrayList, DocumentLinksListActivity.this);
                         recyclerView.setAdapter(documentLinkAdapter);
                     }
-                }
+
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
