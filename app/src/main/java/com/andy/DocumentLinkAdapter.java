@@ -42,8 +42,15 @@ public class DocumentLinkAdapter extends RecyclerView.Adapter<DocumentLinkAdapte
                 Uri uri = Uri.parse(list.get(i).getDocumentLink());
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setDataAndType(uri, "application/pdf");
+                intent.putExtra("URI", uri.toString());
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                String path = uri.getPath();
+
+                if (!path.isEmpty() && path.contains("PDF") || path.contains("pdf")) {
+                    intent.setDataAndType(uri, "application/pdf");
+                } else {
+                    intent.setClass(context.getApplicationContext(), FeedsWebViewActivity.class);
+                }
                 context.startActivity(intent);
             }
         });
