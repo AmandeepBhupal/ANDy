@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -13,7 +14,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,8 +52,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +78,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     private Object timestamp = ServerValue.TIMESTAMP;
     private String UID;
 
-    //Boolean to decide whether it is a pdf,img
-    boolean decideAttachment;
+    String currentPhotoPath;
 
     //Firebase from the pdf YT video
     private StorageReference storageReference;
@@ -84,6 +90,9 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
     //Progress dialog
     ProgressDialog progressDialog;
+
+    //boolean to check if it is PDF or Gallery
+    boolean decideAttachment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +121,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         //Drop down attachments
         List<String> docType = new ArrayList<String>();
         docType.add("Select Item to Attach");
-        docType.add("IMAGE");
+        docType.add("GALLERY");
+        docType.add("CAMERA");
         docType.add("PDF");
 
         //Drop down tags
@@ -144,10 +154,15 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                 String value = String.valueOf(spinnerForAttach.getSelectedItem());//gets which item is selected
                 //if statement checks if permission is granted
                 if(ContextCompat.checkSelfPermission(CreateActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
-                    if (value == "PDF") {
+                    if (value.equals("PDF")) {
+                        decideAttachment = true;
                         attachpdf();
-                    } else {
-                        attachimg();
+                    } else if(value.equals("GALLERY")) {
+                        decideAttachment = false;
+                        attachFromGallery();
+                    }else{
+                        askCameraPermissions();
+                        attachFromCamera();
                     }
                 }else //else requests permissions and invokes another method which checks the request number
                     ActivityCompat.requestPermissions(CreateActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},9);
@@ -192,6 +207,14 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
             }
         });
 
+    }
+
+    private void askCameraPermissions() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},101);
+        }else{
+            openCamera();
+        }
     }
 
     //CHeck if the UId is the same
@@ -289,18 +312,34 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         if(requestCode==9&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
-            attachpdf();
+            if(decideAttachment)
+                attachpdf();
+            else
+                attachFromGallery();
         }else
             Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_LONG).show();
+
+        if(requestCode==101&&grantResults[1]==PackageManager.PERMISSION_GRANTED){
+            openCamera();
+        }else
+            Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_SHORT).show();
     }
 
-    //attach image
-    private void attachimg() {
-        decideAttachment = true;
+    //attach image from gallery
+    private void attachFromGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent,90);
+    }
+
+    private void openCamera(){
+        dispatchTakePictureIntent();
+    }
+
+    //capture image from camera
+    private void attachFromCamera(){
+
     }
 
     //attach pdf
@@ -308,7 +347,6 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         //offer user to select file from File manager
         //use intent to do so
 
-        decideAttachment = false;
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT); //this will be used to fetch files
@@ -326,8 +364,52 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         } else {
             Toast.makeText(CreateActivity.this, "Please select the file", Toast.LENGTH_LONG).show();
         }
+        if(requestCode == 69 && resultCode == RESULT_OK && data != null){
+            File f = new File(currentPhotoPath);
+            Log.d("tag", "Absolute URL"+ Uri.fromFile(f));
+
+            Intent mediaScanIntent = new Intent (Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri contentUri = Uri.fromFile(f);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
+
+        }
 
     }
+
+    private File createImageFile() throws IOException{
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timestamp + "_";
+        //File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,".jpg",storagDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, 69);
+            }
+        }
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
