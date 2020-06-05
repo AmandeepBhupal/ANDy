@@ -246,7 +246,7 @@ public class ProfileFragment extends Fragment {
         Chip lChip = new Chip(getActivity());
         lChip.setText(pItem);
         lChip.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        lChip.setChipBackgroundColor(getResources().getColorStateList(R.color.colorAccent));
+        lChip.setChipBackgroundColor(getResources().getColorStateList(R.color.primary_light));
         pChipGroup.addView(lChip, pChipGroup.getChildCount() - 1);
     }
 }
