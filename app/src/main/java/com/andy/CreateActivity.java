@@ -218,7 +218,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},101);
         }else{
-            openCamera();
+            dispatchTakePictureIntent();
         }
     }
 
@@ -330,7 +330,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
             Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_LONG).show();
 
         if(requestCode==101&&grantResults[1]==PackageManager.PERMISSION_GRANTED){
-            openCamera();
+            dispatchTakePictureIntent();
         }else
             Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_SHORT).show();
     }
@@ -343,11 +343,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         startActivityForResult(intent,90);
     }
 
-    private void openCamera(){
-        dispatchTakePictureIntent();
-    }
-
-    //capture image from camera
+       //capture image from camera
     private void attachFromCamera(){
 
     }
@@ -388,12 +384,17 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     }
 
     private File createImageFile() throws IOException{
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timestamp + "_";
-        //File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        //timestamp to create filename
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
-        File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName,".jpg",storagDir);
+        // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -407,7 +408,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                // Error occurred while creating the File
+                Toast.makeText(CreateActivity.this,"dispathtakepicintent",Toast.LENGTH_SHORT).show();
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {

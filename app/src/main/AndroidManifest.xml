@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".myApp">
+        android:name=".myApp"
+        android:requestLegacyExternalStorage="true">
         <activity android:name=".FeedsWebViewActivity"
             android:parentActivityName=".MainActivity">
         </activity>
