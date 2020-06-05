@@ -128,8 +128,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         //Drop down tags
         List<String> tagType = new ArrayList<String>();
         tagType.add("Select Tag");
-        tagType.add("topic1");
-        tagType.add("topic2");
+        tagType.add("Relative Layout");
+        tagType.add("Sensors");
         tagType.add("topic3");
         tagType.add("topic4");
         tagType.add("topic5");
@@ -180,7 +180,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                 String valueForAttach = String.valueOf(spinnerForAttach.getSelectedItem());
                 String valueForTags = String.valueOf(spinnerForTags.getSelectedItem());
 
-                if (valueForTags != "Select Tag") {
+                if (!valueForTags.equals("Select Tag")) {
                     if (!docTitle.getText().toString().isEmpty()
                             || !docContent.getText().toString().isEmpty()) {
 
