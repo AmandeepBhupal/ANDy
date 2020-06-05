@@ -2,6 +2,9 @@ package com.andy;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -110,10 +113,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
-
+        // Create an Intent for the activity you want to start
+        Intent resultIntent = new Intent(this, MainActivity.class);
+// Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+// Get the PendingIntent containing the entire back stack
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "n")
-                .setContentText("Andy")
-                .setSmallIcon(R.drawable.ic_person)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true)
                 .setContentText("New Document added to " + tagName)
                 .setContentTitle("ANDy - New content Alert!!")
