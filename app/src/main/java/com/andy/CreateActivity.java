@@ -67,7 +67,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     private TextView textTitle;
     private EditText docTitle;
     private EditText docContent;
-    private Button attach,save,submit;
+    private Button attach,submit;
     private Object timestamp = ServerValue.TIMESTAMP;
     private String UID;
 
@@ -92,7 +92,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //initializing objects
-        textTitle = (TextView)findViewById(R.id.textView);
+        textTitle = findViewById(R.id.textView);
         docTitle = (EditText)findViewById(R.id.enterTitle);
         docContent = (EditText)findViewById(R.id.textDesc);
         attach = (Button)findViewById(R.id.attach);
@@ -144,7 +144,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                 String value = String.valueOf(spinnerForAttach.getSelectedItem());//gets which item is selected
                 //if statement checks if permission is granted
                 if(ContextCompat.checkSelfPermission(CreateActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
-                    if (value == "PDF") {
+                    if (value.equals("PDF")) {
                         attachpdf();
                     } else {
                         attachimg();
@@ -232,7 +232,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
         final String filename = System.currentTimeMillis()+"";
 
-        if(valueForAttach == "PDF")
+        if(valueForAttach.equals( "PDF"))
             pdfRef = storageReference.child("pdf/" + filename);
         else
             pdfRef = storageReference.child("image/" + filename);
