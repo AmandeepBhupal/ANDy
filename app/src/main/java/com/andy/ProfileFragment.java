@@ -232,7 +232,7 @@ public class ProfileFragment extends Fragment {
                 }
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     userDocumentList.add(ds.getValue().toString());
-                    addChip(ds.getValue().toString(),userDocument);
+                    addChip(ds.getKey().toString(),userDocument);
                 }
             }
 
