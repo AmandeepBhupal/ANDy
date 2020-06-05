@@ -127,7 +127,7 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        Toast.makeText(getActivity().getApplicationContext(), uID, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getActivity().getApplicationContext(), uID, Toast.LENGTH_SHORT).show();
         Log.d("TAGS",uID);
 
         reference = FirebaseDatabase.getInstance().getReference()
@@ -136,7 +136,7 @@ public class ProfileFragment extends Fragment {
 
         getActivity().setTitle("User Profile");
 
-        Toast.makeText(getActivity().getApplicationContext(), "Profile ---", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getActivity().getApplicationContext(), "Profile ---", Toast.LENGTH_SHORT).show();
 
         getData(reference);
 
