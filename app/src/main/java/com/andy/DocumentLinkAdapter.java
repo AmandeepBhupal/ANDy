@@ -35,13 +35,6 @@ public class DocumentLinkAdapter extends RecyclerView.Adapter<DocumentLinkAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
 
-        //Random rnd = new Random();
-        //int currentStrokeColor = Color.argb(100, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-
-
-        //viewHolder.documentName.setBackgroundColor(currentStrokeColor);
-
-
         viewHolder.documentName.setText(list.get(i).getDocumentName());
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
