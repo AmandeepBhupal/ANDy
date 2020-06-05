@@ -210,7 +210,7 @@ public class ProfileFragment extends Fragment {
                 }
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     userTagsList.add(ds.getValue().toString());
-                    addChip(ds.getValue().toString(),userTopics);
+                    addChip(ds.getKey().toString(),userTopics);
                 }
             }
 
