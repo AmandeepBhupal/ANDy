@@ -40,11 +40,6 @@ public class DocumentLinkAdapter extends RecyclerView.Adapter<DocumentLinkAdapte
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse(list.get(i).getDocumentLink());
-               /* Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setDataAndType(uri, "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                context.startActivity(intent);*/
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("URI", uri.toString());
