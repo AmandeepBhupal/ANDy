@@ -116,7 +116,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 .setSmallIcon(R.drawable.ic_person)
                 .setAutoCancel(true)
                 .setContentText("New Document added to " + tagName)
-                .setContentTitle("ANDy - New content Alert!!");
+                .setContentTitle("ANDy - New content Alert!!")
+                ;
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
         managerCompat.notify(999, builder.build());
 
