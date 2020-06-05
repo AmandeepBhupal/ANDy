@@ -380,6 +380,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     private File createImageFile() throws IOException{
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timestamp + "_";
+        //File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
         File storagDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName,".jpg",storagDir);
         currentPhotoPath = image.getAbsolutePath();
