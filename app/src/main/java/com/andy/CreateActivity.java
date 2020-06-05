@@ -187,6 +187,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                         if (externalFile != null)
                             uploadFile(externalFile, valueForTags,valueForAttach);
                         else {
+
                             /*reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("desc").setValue(docContent.getText().toString());
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("timestamp").setValue(timestamp);
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("title").setValue(docTitle.getText().toString());
