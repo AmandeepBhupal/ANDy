@@ -255,7 +255,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     Profile pf = new Profile();
                                     pf.setName(inputUserName.getText().toString());
                                     pf.setEmail(inputEmail.getText().toString());
-                                    pf.setProfilePicture("https://images.app.goo.gl/WhPFyf8s2fYpABpBA");
+                                    pf.setProfilePicture("https://drive.google.com/file/d/1S-FhCulXC_vbiYBwspqZ6yrhALvVqYGh/view?usp=sharing");
                                     pf.setDocuments(new ArrayList<String>());
                                     pf.setTags(new ArrayList<String>());
                                     current_userdb.setValue(pf);
