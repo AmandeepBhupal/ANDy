@@ -52,7 +52,8 @@ public class DocumentLinksListActivity extends AppCompatActivity {
                                 map.get("title"),
                                 map.get("url"),
                                 map.get("desc"),
-                                map.get("timestamp"));
+                                map.get("timestamp")
+                            );
 
                             documentLinkArrayList.add(documentLink);
 

@@ -75,7 +75,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText docTitle;
     private EditText docContent;
     private Button attach,save,submit;
-    private Object timestamp = ServerValue.TIMESTAMP;
+    private String timestamp = ServerValue.TIMESTAMP.toString();
     private String UID;
 
     String currentPhotoPath;
