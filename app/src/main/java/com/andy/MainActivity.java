@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         doThis();
+
         if (tagSet.isEmpty()){
             loadFragment(new SearchFragment());
         }
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //getting bottom navigation view and attaching the listener
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
-
 
     }
 
@@ -104,9 +104,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private void updatetagSet(Iterable<DataSnapshot> allTags) {
         for (DataSnapshot tag : allTags) {
             tagSet.add(tag.getValue().toString());
+
         }
         for (String tags : tagSet) {
             Log.d("TAGS", tags);
+        }
+
+        if(!tagSet.isEmpty()) {
+            loadFragment(new FeedsFragment());
         }
     }
 

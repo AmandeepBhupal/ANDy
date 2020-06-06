@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +40,9 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     FirebaseAuth mAuth;
     String uID;
     FirebaseDatabase firebaseDB;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+
     DatabaseReference reference;
     Intent intent;
     //Intent intent = new Intent(this,FeedsWebViewActivity.class);
@@ -52,6 +57,7 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feeds_card_view, viewGroup, false);
         return new ViewHolder(view);
     }
@@ -121,6 +127,12 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
                 } else {
                     intent.setClass(context.getApplicationContext(), FeedsWebViewActivity.class);
                 }
+
+                Bundle bundle = new Bundle();
+
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, documentArrayList.get(i).getDocumentName());
+                //bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
                 context.startActivity(intent);
 

@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class FeedsWebViewActivity extends AppCompatActivity {
 
     WebView webView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
