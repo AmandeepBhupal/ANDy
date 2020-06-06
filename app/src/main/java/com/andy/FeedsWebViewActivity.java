@@ -25,15 +25,13 @@ public class FeedsWebViewActivity extends AppCompatActivity {
         webView.setWebViewClient(new webViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
 
+        String viewType = "";
+        boolean loadData = true;
 
-
-        String viewType = "";boolean loadData = true;
-
-        if(url.length() > 4)
-        {
-            String substring = url.substring(0,4);
+        if (url.length() > 4) {
+            String substring = url.substring(0, 4);
             substring = substring.toLowerCase();
-            if(substring.contains("http")|| substring.contains("file")){
+            if (substring.contains("http") || substring.contains("file")) {
 
                 webView.getSettings().setLoadWithOverviewMode(true);
                 webView.getSettings().setUseWideViewPort(true);
@@ -50,7 +48,7 @@ public class FeedsWebViewActivity extends AppCompatActivity {
                 loadData = false;
             }
         }
-        if(loadData) {
+        if (loadData) {
             webView.loadData(url, "text/html; charset=utf-8", "utf-8");
         }
 
@@ -59,10 +57,10 @@ public class FeedsWebViewActivity extends AppCompatActivity {
 
 }
 
-    class webViewClient extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return true;
-        }
+class webViewClient extends WebViewClient {
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        view.loadUrl(url);
+        return true;
+    }
 }

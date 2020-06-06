@@ -103,8 +103,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void updatetagSet(Iterable<DataSnapshot> allTags) {
         for (DataSnapshot tag : allTags) {
-            if (!tagSet.contains(tag.toString()))
-                tagSet.add(tag.getValue().toString());
+            tagSet.add(tag.getValue().toString());
         }
         for (String tags : tagSet) {
             Log.d("TAGS", tags);
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         }
 
-
+        ;
         //tags in profile
 
         reference.child("Profile").child(uID).child("tags")

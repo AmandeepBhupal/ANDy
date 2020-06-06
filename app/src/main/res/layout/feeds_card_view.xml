@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/topicsImageView"
             android:layout_width="match_parent"
-            android:layout_height="100sp"
+            android:layout_height="30sp"
             android:adjustViewBounds="true"
             android:background="@color/divider"
             />
@@ -25,8 +25,9 @@
             android:layout_alignRight="@id/topicsImageView"
             android:padding="2sp"
             android:text="Subscribe"
+
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"
+            android:textSize="8sp"
             style="@style/Widget.MaterialComponents.Button.TextButton"/>
         <Button
             android:layout_marginLeft="3dp"
@@ -37,13 +38,16 @@
             android:layout_alignRight="@id/topicsImageView"
             android:padding="2sp"
             android:text="Unsubscribe"
+
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"
+            android:textSize="8sp"
             style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
         <TextView
             android:id="@+id/title"
             style="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="12sp"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -62,12 +66,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/documentName"
+                android:id="@+id/documentTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="sample"
-                android:textSize="25sp"
-                android:padding="10dp"
+                android:textSize="20sp"
+                android:padding="20dp"
                 />
 
 

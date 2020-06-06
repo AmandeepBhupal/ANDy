@@ -173,7 +173,6 @@ public class FeedsFragment extends Fragment {
                     });
 
 
-
             reference.child("Topics").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -185,51 +184,52 @@ public class FeedsFragment extends Fragment {
                     Vector<TopicNotification> topicsVector = new Vector<>();
                     for (DataSnapshot t1 : allTags) {
                         String topic = t1.getValue().toString();
+
                         topicsVectorFromTopics.add(topic); // for debugging only and future use
                         String id = t1.child("topicid").getValue().toString();
                         String topicDesc = t1.child("topicdesc").getValue().toString();
+
+                        //Just for debugging
+                        if (id.compareTo("Sensors") != 0) {
+                            continue;
+                        }
+                        //Just for debugging end
+
                         Log.i("TOPICID", id);
                         Log.i("TAGS", topicsVectorFromTags.toString());
                         Iterator docChildren = t1.child("documents").getChildren().iterator();
 
                         while (docChildren.hasNext() && !id.isEmpty() && topicsVectorFromTags.contains(id)) {
                             DataSnapshot childIter = ((DataSnapshot) docChildren.next());
-                            String documentKey = childIter.getKey();
-                            String documentValue = "";
-                            Object ds_value = childIter.getValue();
-                            if (ds_value != null) {
-                                documentValue = ds_value.toString();
-                            }
-                            if (!documentKey.isEmpty() && !documentValue.isEmpty()) {
 
-                                DocumentLink documentLink = new DocumentLink(documentKey, documentValue);
-                               inputTopicsDocuments.add(documentLink);
-//                                  public TopicNotification(topicDesc,id,documentKey) {
-//                                    this.topicDescription = topicDescription;
-//                                    this.topicTitle = topicTitle;
-//                                    this.key = key;
-//                                }
-                                //TopicNotification v1 = new TopicNotification(topicDesc,id,documentValue);
-                                TopicNotification v1 = new TopicNotification(topicDesc,id,documentKey);
+                            String documentKey = childIter.child("url").getValue().toString();
+                            String documentTitle = childIter.child("title").getValue().toString();
+                            String documentURL = childIter.child("url").getValue().toString();
+                            String documentDesc = childIter.child("desc").getValue().toString();
+                            String documentTimestamp = childIter.child("timestamp").getValue().toString();
+
+
+                            if (!documentKey.isEmpty() && !documentDesc.isEmpty()) {
+                                DocumentLink documentLink = new DocumentLink(documentTitle, documentURL, documentDesc, documentTimestamp);
+                                inputTopicsDocuments.add(documentLink);
+
+                                TopicNotification v1 = new TopicNotification(topicDesc, id, documentKey);
                                 topicsVector.add(v1);
 
-
                                 Log.i("DOCUMENT_KEY", documentKey);
-                                Log.i("DOCUMENT_VALUE", documentValue);
+                                Log.i("DOCUMENT_VALUE", documentTitle);
                             }
                         }
                     }
-                 //   if (!inputTopicsDocuments.isEmpty())
-                    if (!topicsVector.isEmpty()){
+
+                    if (!topicsVector.isEmpty()) {
                         ArrayList<TopicNotification> topicArrayList = new ArrayList<TopicNotification>(topicsVector);
                         ArrayList<DocumentLink> arrayList = new ArrayList<DocumentLink>(inputTopicsDocuments);
-                        FeedsAdapter feedsAdapter = new FeedsAdapter(topicArrayList, arrayList, getContext(),coordinatorLayout);
+                        FeedsAdapter feedsAdapter = new FeedsAdapter(topicArrayList, arrayList, getContext(), coordinatorLayout);
                         recyclerView.setAdapter(feedsAdapter);
 
                     }
                 }
-
-
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
