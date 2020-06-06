@@ -189,6 +189,11 @@ public class FeedsFragment extends Fragment {
                         String id = t1.child("topicid").getValue().toString();
                         String topicDesc = t1.child("topicdesc").getValue().toString();
 
+                        //Just for debugging
+                        /*if (id.compareTo("Sensors") != 0) {
+                            continue;
+                        }*/
+                        //Just for debugging end
 
                         Log.i("TOPICID", id);
                         Log.i("TAGS", topicsVectorFromTags.toString());
