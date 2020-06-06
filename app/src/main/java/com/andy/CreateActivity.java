@@ -189,7 +189,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                         else {
 
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("desc").setValue(docContent.getText().toString());
-                            reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("timestamp").setValue(timestamp.toString());
+                            reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("timestamp").setValue(timestamp);
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("title").setValue(docTitle.getText().toString());
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("url").setValue("null");
                             //reference.child("Topics").child("TEST").child("documents").child(docTitle.getText().toString()).setValue(docContent.getText().toString());
@@ -277,7 +277,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                                     public void onSuccess(Uri uri) {
                                         String imagepath = uri.toString();
                                         reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("desc").setValue(docContent.getText().toString());
-                                        reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("timestamp").setValue(timestamp.toString());
+                                        reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("timestamp").setValue(timestamp);
                                         reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("title").setValue(docTitle.getText().toString());
                                         reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("url").setValue(imagepath);
 
