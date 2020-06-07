@@ -227,7 +227,7 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
 
                 if (dsLikeCount.getValue() == null) {
                     Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("likecount", "1");
+                    childUpdates.put("likecount", 1);
                     like.updateChildren(childUpdates);
                 }
                 final DataSnapshot dsLikeCountUpdated = dataSnapshot.child("likecount");
