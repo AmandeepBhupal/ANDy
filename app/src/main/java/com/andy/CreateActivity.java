@@ -76,8 +76,6 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     public static final int REQUEST_CODE_CAMERA = 101;
     private Uri externalFile = null; //URLs that are meant for local storage
     private Uri url;
-    private ImageView close;
-
     private TextView textTitle;
     private ImageView trial;
     private EditText docTitle;
@@ -418,15 +416,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                     trial.setImageBitmap(thumbnail);
 
             }
-        }
-//        if (requestCode == 86 && resultCode == RESULT_OK && data != null||requestCode == 90&&resultCode==RESULT_OK&&data!=null) {
-//            externalFile = data.getData(); //returns the Uri of selected file local
-//            Log.d("for pdf",externalFile.toString());
-//        } else if(requestCode == 69) {
-//            url = data.getData();
-//            Log.d("For camera",url.toString());
-//        }
-            else{
+        } else{
             Toast.makeText(CreateActivity.this, "Please select the file", Toast.LENGTH_LONG).show();
         }
 
