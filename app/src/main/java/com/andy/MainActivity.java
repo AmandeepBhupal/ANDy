@@ -194,14 +194,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                         Toast.makeText(MainActivity.this, "Child added in" + dataSnapshot.child("topicid").getValue().toString(), Toast.LENGTH_SHORT).show();
 
                         Log.d("TAGS", tagSet.toString());
                         Log.d("TAGS", dataSnapshot.child("topicid").getValue().toString());
                         if (tagSet.contains(dataSnapshot.child("topicid").getValue().toString())) {
-                            Toast.makeText(MainActivity.this, "Document added to " + dataSnapshot.child("topicid").getValue().toString(), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(MainActivity.this, "Document added to " + dataSnapshot.child("topicid").getValue().toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, "Document updated " + dataSnapshot.child("topicid").getValue().toString(), Toast.LENGTH_LONG).show();
                             notification(dataSnapshot.getKey());
                         }
+
                     }
 
                     @Override

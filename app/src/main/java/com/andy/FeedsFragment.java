@@ -137,6 +137,7 @@ public class FeedsFragment extends Fragment {
             }
         });
 
+
         fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +164,10 @@ public class FeedsFragment extends Fragment {
                             Log.d("Debug", allTags.toString());
                             topicsVectorFromTags = new Vector<>();
                             for (DataSnapshot tag : allTags) {
-                                String topic = tag.getValue().toString();
+                                String topic = "";
+                                if (tag.getValue() != null) {
+                                    topic = tag.getValue().toString();
+                                }
                                 topicsVectorFromTags.add(topic);
                             }
                         }
@@ -188,8 +192,14 @@ public class FeedsFragment extends Fragment {
                         String topic = t1.getValue().toString();
 
                         topicsVectorFromTopics.add(topic); // for debugging only and future use
-                        String id = t1.child("topicid").getValue().toString();
-                        String topicDesc = t1.child("topicdesc").getValue().toString();
+                        String id = "";
+                        if (t1.child("topicid").getValue() != null) {
+                            id = t1.child("topicid").getValue().toString();
+                        }
+                        String topicDesc = "";
+                        if (t1.child("topicdesc").getValue() != null) {
+                            t1.child("topicdesc").getValue().toString();
+                        }
 
                         //Just for debugging
                         /*if (id.compareTo("Sensors") != 0) {
@@ -204,12 +214,29 @@ public class FeedsFragment extends Fragment {
                         while (docChildren.hasNext() && !id.isEmpty() && topicsVectorFromTags.contains(id)) {
                             DataSnapshot childIter = ((DataSnapshot) docChildren.next());
 
-                            String documentKey = childIter.child("url").getValue().toString();
-                            String documentTitle = childIter.child("title").getValue().toString();
-                            String documentURL = childIter.child("url").getValue().toString();
-                            String documentDesc = childIter.child("desc").getValue().toString();
-                            String documentTimestamp = childIter.child("timestamp").getValue().toString();
 
+                            String documentKey = "";
+                            if (childIter.child("url").getValue() != null) {
+                                documentKey = childIter.child("url").getValue().toString();
+                            }
+                            String documentTitle = "";
+                            if (childIter.child("title").getValue() != null) {
+                                documentTitle = childIter.child("title").getValue().toString();
+                            }
+
+                            String documentURL = "";
+                            if (childIter.child("url").getValue() != null) {
+                                documentURL = childIter.child("url").getValue().toString();
+                            }
+
+                            String documentDesc = "";
+                            if (childIter.child("desc").getValue() != null) {
+                                documentDesc = childIter.child("desc").getValue().toString();
+                            }
+                            String documentTimestamp = "";
+                            if (childIter.child("timestamp").getValue() != null) {
+                                documentTimestamp = childIter.child("timestamp").getValue().toString();
+                            }
 
                             if (!documentKey.isEmpty() && !documentDesc.isEmpty()) {
                                 DocumentLink documentLink = new DocumentLink(documentTitle, documentURL, documentDesc, documentTimestamp);
