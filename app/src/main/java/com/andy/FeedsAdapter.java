@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,9 +29,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> implements View.OnClickListener {
 
@@ -41,11 +48,10 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     String uID;
     FirebaseDatabase firebaseDB;
     private FirebaseAnalytics mFirebaseAnalytics;
-
+    public String likeDocumentString = "";
 
     DatabaseReference reference;
     Intent intent;
-    //Intent intent = new Intent(this,FeedsWebViewActivity.class);
 
     FeedsAdapter(ArrayList<TopicNotification> topicArrayList, ArrayList<DocumentLink> docList, Context context, CoordinatorLayout coordinatorLayout) {
         this.topicArrayList = topicArrayList;
@@ -139,6 +145,14 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
             }
         });
 
+        updateLikeStatus(viewHolder, i);
+
+        viewHolder.likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                likeButtonClicked(v, i);
+            }
+        });
 
 
         /*
@@ -150,6 +164,157 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
         });
 
          */
+    }
+
+    public void updateLikeStatus(final ViewHolder viewHolder, int i) {
+        final DatabaseReference like = reference.child(ConstantsKeyNames.DATA_FIREBASE_KEY).child(topicArrayList.get(i).getTopicTitle()).child("documents").child(documentArrayList.get(i).getDocumentName());
+
+        like.addListenerForSingleValueEvent((new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                final DataSnapshot dsLikeCount = dataSnapshot.child("likecount");
+                final DataSnapshot dsTitle = dataSnapshot.child("title");
+                final DatabaseReference profileLike = FirebaseDatabase.getInstance().getReference().child(ConstantsKeyNames.PROFILE_FIREBASE_KEY).child(uID);
+
+                profileLike.addListenerForSingleValueEvent((new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DataSnapshot dsLike = dataSnapshot.child("like");
+                        if (dsLike != null) {
+                            if (dsLike.child(dsTitle.getValue().toString()) != null) {
+                                String status = "";
+                                if (dsLike.child(dsTitle.getValue().toString()).getValue() != null) {
+                                    status = dsLike.child(dsTitle.getValue().toString()).getValue().toString();
+                                }
+                                if (!status.isEmpty()) {
+                                    viewHolder.likeButton.setImageResource(R.drawable.ic_thumb_up);
+                                } else {
+                                    viewHolder.likeButton.setImageResource(R.drawable.ic_thumb_down);
+                                }
+                                if (dsLikeCount.getValue() != null) {
+                                    viewHolder.likeCount.setText(dsLikeCount.getValue().toString());
+                                } else {
+                                    viewHolder.likeCount.setText("0");
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }));
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        }));
+    }
+
+    public void likeButtonClicked(final View v, int i) {
+
+        final DatabaseReference like = FirebaseDatabase.getInstance().getReference().child(ConstantsKeyNames.DATA_FIREBASE_KEY).child(topicArrayList.get(i).getTopicTitle()).child("documents").child(documentArrayList.get(i).getDocumentName());
+        like.addListenerForSingleValueEvent((new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DataSnapshot dsLikeCount = dataSnapshot.child("likecount");
+                final DataSnapshot dsTitle = dataSnapshot.child("title");
+
+                if (dsLikeCount.getValue() == null) {
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("likecount", "1");
+                    like.updateChildren(childUpdates);
+                    return;
+                }
+                final DataSnapshot dsLikeCountUpdated = dataSnapshot.child("likecount");
+
+                likeDocumentString = "";
+                final DatabaseReference profileLike = FirebaseDatabase.getInstance().getReference().child(ConstantsKeyNames.PROFILE_FIREBASE_KEY).child(uID);
+
+                profileLike.addListenerForSingleValueEvent((new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DataSnapshot dsLike = dataSnapshot.child("like");
+                        if (dsLike != null) {
+                            if (dsLike.child(dsTitle.getValue().toString()) != null) {
+                                String status = "";
+                                if (dsLike.child(dsTitle.getValue().toString()).getValue() != null) {
+                                    status = dsLike.child(dsTitle.getValue().toString()).getValue().toString();
+                                }
+                                if (!status.isEmpty()) {
+                                    likeDocumentString = dsLike.child(dsTitle.getValue().toString()).getKey();
+                                }
+                            }
+                        }
+
+                        //final DataSnapshot temp = dsLikeCount;
+                        updateLike(profileLike, like, dsTitle, dsLikeCountUpdated, v);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        }));
+    }
+
+    public void updateLike(DatabaseReference profileLike, DatabaseReference like, DataSnapshot dsTitle, DataSnapshot dsLikeCount, View v) {
+
+        if (!likeDocumentString.isEmpty()) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/like/" + dsTitle.getValue(), null);
+            profileLike.updateChildren(childUpdates);
+            profileLike.child(likeDocumentString).removeValue();
+            int likeCountInteger = 0;
+            if (dsLikeCount.getValue() != null) {
+                likeCountInteger = Integer.parseInt(dsLikeCount.getValue().toString());
+            }
+            likeCountInteger = likeCountInteger - 1;
+            like.child("likecount").setValue(likeCountInteger);
+            ViewHolder vh = new ViewHolder(v);
+            ImageButton btn = vh.likeButton;
+            btn.setImageResource(R.drawable.ic_thumb_down);
+
+            final ViewParent parent = v.getParent();
+            if (parent instanceof View) {
+                final View vp = (View) parent;
+                ViewHolder vl = new ViewHolder(vp);
+                vl.likeCount.setText(Integer.toString(likeCountInteger));
+            }
+        } else {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/like/" + dsTitle.getValue(), "true");
+            profileLike.updateChildren(childUpdates);
+            int likeCountInteger = 0;
+            if (dsLikeCount.getValue() != null) {
+                likeCountInteger = Integer.parseInt(dsLikeCount.getValue().toString());
+            }
+            likeCountInteger = likeCountInteger + 1;
+            like.child("likecount").setValue(likeCountInteger);
+            ViewHolder vh = new ViewHolder(v);
+            ImageButton btn = vh.likeButton;
+            btn.setImageResource(R.drawable.ic_thumb_up);
+
+            final ViewParent parent = v.getParent();
+            if (parent instanceof View) {
+                final View vp = (View) parent;
+                ViewHolder vl = new ViewHolder(vp);
+                vl.likeCount.setText(Integer.toString(likeCountInteger));
+            }
+        }
     }
 
     @Override
@@ -166,9 +331,12 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
-        TextView docDescription;
+        TextView docDescription, likeCount;
         private TextView documentTitle;
         Button viewDocument, subscribe, unsubscribe;
+        ImageButton likeButton;
+        //Button likeButton;
+
         ImageView topicsImage;
 
         ViewHolder(@NonNull View itemView) {
@@ -179,6 +347,8 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
             subscribe = itemView.findViewById(R.id.subscribe);
             unsubscribe = itemView.findViewById(R.id.unsubscribe);
             topicsImage = itemView.findViewById(R.id.topicsImageView);
+            likeButton = itemView.findViewById(R.id.likeButton);
+            likeCount = itemView.findViewById(R.id.likeCount);
         }
 
         public TextView getDocumentTitle() {
