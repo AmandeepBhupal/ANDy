@@ -8,10 +8,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -52,7 +55,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -67,11 +73,13 @@ import javax.crypto.SecretKey;
 
 public class CreateActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    public static final int REQUEST_CODE_CAMERA = 101;
     private Uri externalFile = null; //URLs that are meant for local storage
     private Uri url;
     private ImageView close;
 
     private TextView textTitle;
+    private ImageView trial;
     private EditText docTitle;
     private EditText docContent;
     private Button attach,save,submit;
@@ -106,6 +114,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         docContent = (EditText)findViewById(R.id.textDesc);
         attach = (Button)findViewById(R.id.attach);
         submit = (Button)findViewById(R.id.submit);
+        trial = (ImageView) findViewById(R.id.trial);
 
         //return an object of FireBase Storage
         storageReference = FirebaseStorage.getInstance().getReference(); // used for uploading files
@@ -216,9 +225,9 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void askCameraPermissions() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},101);
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA);
         }else{
-            dispatchTakePictureIntent();
+            attachFromCamera();
         }
     }
 
@@ -329,8 +338,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         }else
             Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_LONG).show();
 
-        if(requestCode==101&&grantResults[1]==PackageManager.PERMISSION_GRANTED){
-            dispatchTakePictureIntent();
+        if(requestCode==REQUEST_CODE_CAMERA&&grantResults[1]==PackageManager.PERMISSION_GRANTED){
+            attachFromCamera();
         }else
             Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_SHORT).show();
     }
@@ -345,6 +354,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
        //capture image from camera
     private void attachFromCamera(){
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent,69);
 
     }
 
@@ -365,62 +376,115 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         //with resultCode : user may not select the file, we are checking if they opened and closed the file manager
         //data : checks whether any data is selected
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 86 && resultCode == RESULT_OK && data != null||requestCode == 90&&resultCode==RESULT_OK&&data!=null) {
-            externalFile = data.getData(); //returns the Uri of selected file local
-        } else {
+
+        if(resultCode==Activity.RESULT_OK ) {
+            switch (requestCode) {
+                case 86 :
+                    externalFile = data.getData();
+                    Log.d("pdf",externalFile.toString());
+                    break;
+
+                case 90:
+                    externalFile = data.getData();
+                    Log.d("image",externalFile.toString());
+                    break;
+
+                case 69:
+                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), thumbnail, "Title", null);
+                    externalFile = Uri.parse(path);
+
+                    File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+
+                    FileOutputStream fos;
+
+                    try
+                    {
+                        destination.createNewFile();
+                        fos = new FileOutputStream(destination);
+                        fos.write(bytes.toByteArray());
+                        fos.close();
+                    }
+                    catch (FileNotFoundException fnfe)
+                    {
+                        fnfe.printStackTrace();
+                    }
+                    catch (IOException ioe)
+                    {
+                        ioe.printStackTrace();
+                    }
+                    trial.setImageBitmap(thumbnail);
+
+            }
+        }
+//        if (requestCode == 86 && resultCode == RESULT_OK && data != null||requestCode == 90&&resultCode==RESULT_OK&&data!=null) {
+//            externalFile = data.getData(); //returns the Uri of selected file local
+//            Log.d("for pdf",externalFile.toString());
+//        } else if(requestCode == 69) {
+//            url = data.getData();
+//            Log.d("For camera",url.toString());
+//        }
+            else{
             Toast.makeText(CreateActivity.this, "Please select the file", Toast.LENGTH_LONG).show();
         }
-        if(requestCode == 69 && resultCode == RESULT_OK && data != null){
-            File f = new File(currentPhotoPath);
-            Log.d("tag", "Absolute URL"+ Uri.fromFile(f));
 
-            Intent mediaScanIntent = new Intent (Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            Uri contentUri = Uri.fromFile(f);
-            mediaScanIntent.setData(contentUri);
-            this.sendBroadcast(mediaScanIntent);
+//            Bitmap image = (Bitmap)data.getExtras().get("data");
+//            trial.setImageBitmap(image);
 
-        }
+//            File f = new File(currentPhotoPath);
+//            Log.d("tag", "Absolute URL"+ Uri.fromFile(f));
+//
+//            Intent mediaScanIntent = new Intent (Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//            Uri contentUri = Uri.fromFile(f);
+//            mediaScanIntent.setData(contentUri);
+//            this.sendBroadcast(mediaScanIntent);
 
     }
+//    private File createImageFile() throws IOException{
+//        //timestamp to create filename
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "JPEG_" + timeStamp + "_";
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File image = File.createTempFile(
+//                imageFileName,  /* prefix */
+//                ".jpg",         /* suffix */
+//                storageDir      /* directory */
+//        );
+//
+//        // Save a file: path for use with ACTION_VIEW intents
+//        currentPhotoPath = image.getAbsolutePath();
+//        return image;
+//    }
 
-    private File createImageFile() throws IOException{
-        //timestamp to create filename
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+//    private void openCamera(){
+//        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(camera,69);
+//    }
 
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(CreateActivity.this,"dispathtakepicintent",Toast.LENGTH_SHORT).show();
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, 69);
-            }
-        }
-    }
-
+//    private void dispatchTakePictureIntent() {
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        // Ensure that there's a camera activity to handle the intent
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//            // Create the File where the photo should go
+//            File photoFile = null;
+//            try {
+//                photoFile = createImageFile();
+//            } catch (IOException ex) {
+//                Toast.makeText(CreateActivity.this,"yaar kyu",Toast.LENGTH_SHORT).show();
+//            }
+//            // Continue only if the File was successfully created
+//            if (photoFile != null) {
+//                Uri photoURI = FileProvider.getUriForFile(this,
+//                        "com.example.android.fileprovider",
+//                        photoFile);
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+//                startActivityForResult(takePictureIntent, 69);
+//            }
+//        }
+//    }
+//
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
