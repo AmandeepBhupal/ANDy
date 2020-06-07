@@ -301,7 +301,9 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
             if (dsLikeCount.getValue() != null) {
                 likeCountInteger = Integer.parseInt(dsLikeCount.getValue().toString());
             }
+
             likeCountInteger = likeCountInteger + 1;
+
             like.child("likecount").setValue(likeCountInteger);
             ViewHolder vh = new ViewHolder(v);
             ImageButton btn = vh.likeButton;
