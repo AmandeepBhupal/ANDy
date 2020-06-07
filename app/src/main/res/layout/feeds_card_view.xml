@@ -95,7 +95,10 @@
             <!--                android:visibility="visible"-->
             <!--                app:icon="@drawable/ic_thumb_up"-->
             <!--                tools:visibility="visible" />-->
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/likeButton"
@@ -144,6 +147,7 @@
 
             <!--                app:layout_constraintLeft_toRightOf="@+id/likeButton"-->
 
+            </LinearLayout>
 
         </LinearLayout>
 

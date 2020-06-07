@@ -47,7 +47,7 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     FirebaseAuth mAuth;
     String uID;
     FirebaseDatabase firebaseDB;
-    private FirebaseAnalytics mFirebaseAnalytics;
+    //    private FirebaseAnalytics mFirebaseAnalytics;
     public String likeDocumentString = "";
 
     DatabaseReference reference;
@@ -63,7 +63,7 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+//      mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feeds_card_view, viewGroup, false);
         return new ViewHolder(view);
     }
@@ -134,11 +134,11 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
                     intent.setClass(context.getApplicationContext(), FeedsWebViewActivity.class);
                 }
 
-                Bundle bundle = new Bundle();
-
-                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, documentArrayList.get(i).getDocumentName());
-                //bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
-                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+//                Bundle bundle = new Bundle();
+//
+//                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, documentArrayList.get(i).getDocumentName());
+//                //bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+//                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
                 context.startActivity(intent);
 
