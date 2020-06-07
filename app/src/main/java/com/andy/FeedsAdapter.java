@@ -167,7 +167,11 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
     }
 
     public void updateLikeStatus(final ViewHolder viewHolder, int i) {
-        final DatabaseReference like = reference.child(ConstantsKeyNames.DATA_FIREBASE_KEY).child(topicArrayList.get(i).getTopicTitle()).child("documents").child(documentArrayList.get(i).getDocumentName());
+        final DatabaseReference like = reference.child(ConstantsKeyNames.DATA_FIREBASE_KEY)
+                .child(topicArrayList.get(i).getTopicTitle())
+                .child("documents")
+                .child(documentArrayList.get(i)
+                        .getDocumentName());
 
         like.addListenerForSingleValueEvent((new ValueEventListener() {
             @Override
