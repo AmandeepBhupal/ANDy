@@ -98,8 +98,6 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     DatabaseReference reference;
     GoogleSignInClient mGoogleSignInClient;
 
-    File pictureFile=null;
-
     //Progress dialog
     ProgressDialog progressDialog;
 
@@ -360,6 +358,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, 69);
+            File pictureFile = null;
             try {
                 pictureFile = getPictureFile();
                 Log.d("INFO",pictureFile.getAbsolutePath());
@@ -414,18 +413,11 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                     break;
 
                 case 69:
-//                    File imgFile = new File(currentPhotoPath);
-//                    externalFile = Uri.fromFile(imgFile);
-//                    if(imgFile.exists())
-//                        trial.setImageURI(Uri.fromFile(imgFile));
-                    Bitmap mybitmap = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
-                    trial.setImageBitmap(mybitmap);
-                    externalFile = Uri.fromFile(pictureFile);
+                    File imgFile = new File(currentPhotoPath);
+                    externalFile = Uri.fromFile(imgFile);
+                    if(imgFile.exists())
+                        trial.setImageURI(Uri.fromFile(imgFile));
                     break;
-
-
-
-
 //
 //                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
 //                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
