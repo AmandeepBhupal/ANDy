@@ -75,6 +75,7 @@ public class SearchFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         FeedsFragment.feedsFragmentCalledReset();
+
     }
 
     @Override
