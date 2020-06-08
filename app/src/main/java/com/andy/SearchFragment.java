@@ -76,6 +76,7 @@ public class SearchFragment extends Fragment {
         }
         FeedsFragment.feedsFragmentCalledReset();
 
+
     }
 
     @Override
