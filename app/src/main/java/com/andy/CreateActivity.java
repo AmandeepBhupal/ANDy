@@ -259,7 +259,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     //actual functioning of uploading the file but it will get additional code for uploading title description and image as well
     private void uploadFile(final Uri externalFile, final String valueForTags, final String valueForAttach) {
 
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this,R.style.MyAlertDialogStyle);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setMessage("Uploading File");
         progressDialog.setProgress(0);
