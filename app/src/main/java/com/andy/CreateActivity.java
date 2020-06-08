@@ -141,10 +141,10 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         List<String> tagType = new ArrayList<String>();
         tagType.add("Select Tag");
         tagType.add("Relative Layout");
-        tagType.add("Fragments");
         tagType.add("Constraint Layout");
         tagType.add("Sensors");
-        tagType.add("topic5");
+        tagType.add("Android Development News");
+
 
         //Creating an adapter for spinner
         ArrayAdapter<String> dataAdapterforAttach = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, docType);
