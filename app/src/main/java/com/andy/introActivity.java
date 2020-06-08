@@ -22,12 +22,14 @@ public class introActivity extends AppCompatActivity {
     private OnboardingAdapter onboardingAdapter;
     private LinearLayout layoutOnboardingIndicators;
     private MaterialButton buttonOnboardingAction;
+    private MaterialButton skipButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
         layoutOnboardingIndicators=findViewById(R.id.layoutOnboardingIndicators);
         buttonOnboardingAction=findViewById(R.id.buttonOnboardingAction);
+        skipButton=findViewById(R.id.buttonOnboardingSkip);
         setupOnboardoingItems();
         final ViewPager2 onboardingViewPager=findViewById(R.id.onboardingViewPager);
         onboardingViewPager.setAdapter(onboardingAdapter);
@@ -61,6 +63,23 @@ public class introActivity extends AppCompatActivity {
                     }
                 }
 
+            }
+        });
+        skipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth mAuth=FirebaseAuth.getInstance();
+                FirebaseUser mUser=mAuth.getCurrentUser();
+                if(mUser!=null){
+                    Intent homeIntent=new Intent(introActivity.this,MainActivity.class);
+                    startActivity(homeIntent);
+                    finish();
+                }
+                else{
+                    Intent homeIntent=new Intent(introActivity.this,LoginActivity.class);
+                    startActivity(homeIntent);
+                    finish();
+                }
             }
         });
 

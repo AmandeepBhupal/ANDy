@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                 checkCredentials();
             }
         });
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

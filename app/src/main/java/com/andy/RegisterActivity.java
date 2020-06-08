@@ -176,6 +176,14 @@ public class RegisterActivity extends AppCompatActivity {
 
             uID = acct.getId();
             current_userdb = FirebaseDatabase.getInstance().getReference().child("Profile");
+            current_userdb = FirebaseDatabase.getInstance().getReference().child("Profile").child(uID);
+            Profile pf = new Profile();
+            pf.setName(googleUserName);
+            pf.setEmail(googleEmail);
+            pf.setProfilePicture(googleProfilePicture);
+            pf.setDocuments(new ArrayList<String>());
+            pf.setTags(new ArrayList<String>(Arrays.asList("ConstraintLayout")));
+            current_userdb.setValue(pf);
             current_userdb.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -185,14 +193,7 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                     else{
 
-                        current_userdb = FirebaseDatabase.getInstance().getReference().child("Profile").child(uID);
-                        Profile pf = new Profile();
-                        pf.setName(googleUserName);
-                        pf.setEmail(googleEmail);
-                        pf.setProfilePicture(googleProfilePicture);
-                        pf.setDocuments(new ArrayList<String>());
-                        pf.setTags(new ArrayList<String>(Arrays.asList("ConstraintLayout")));
-                        current_userdb.setValue(pf);
+
                     }
                 }
 
