@@ -353,7 +353,6 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
     //capture image from camera
     private void attachFromCamera() {
-
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
         if (intent.resolveActivity(getPackageManager()) != null) {
@@ -361,13 +360,12 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
             File pictureFile = null;
             try {
                 pictureFile = getPictureFile();
-                Log.d("INFO",pictureFile.getAbsolutePath());
             } catch (IOException ex) {
                 Toast.makeText(CreateActivity.this, "PHOTO not created", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (pictureFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.andy.provider", pictureFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "com.andy", pictureFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(intent, 69);
             }
@@ -376,11 +374,15 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     public File getPictureFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         String pictureFile = "ANDy_" + timeStamp;
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = new File(Environment.getExternalStorageDirectory().toString(),"pictures");
+        storageDir.mkdirs();
         File image = File.createTempFile(pictureFile, ".jpg", storageDir);
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
+
+
+
 
     //attach pdf
     private void attachpdf() {
@@ -413,40 +415,34 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                     break;
 
                 case 69:
-                    File imgFile = new File(currentPhotoPath);
-                    externalFile = Uri.fromFile(imgFile);
-                    if(imgFile.exists())
-                        trial.setImageURI(Uri.fromFile(imgFile));
-                    break;
-//
-//                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//                    assert thumbnail != null;
-//                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), thumbnail, String.valueOf(docTitle), null);
-//                    externalFile = Uri.parse(path);
-//
-//                    File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
-//
-//                    FileOutputStream fos;
-//
-//                    try
-//                    {
-//                        destination.createNewFile();
-//                        fos = new FileOutputStream(destination);
-//                        fos.write(bytes.toByteArray());
-//                        fos.close();
-//                    }
-//                    catch (FileNotFoundException fnfe)
-//                    {
-//                        fnfe.printStackTrace();
-//                    }
-//                    catch (IOException ioe)
-//                    {
-//                        ioe.printStackTrace();
-//                    }
-//                    trial.setImageBitmap(thumbnail);
+                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    assert thumbnail != null;
+                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), thumbnail, String.valueOf(docTitle), null);
+                    externalFile = Uri.parse(path);
 
+                    File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+
+                    FileOutputStream fos;
+
+                    try
+                    {
+                        destination.createNewFile();
+                        fos = new FileOutputStream(destination);
+                        fos.write(bytes.toByteArray());
+                        fos.close();
+                    }
+                    catch (FileNotFoundException fnfe)
+                    {
+                        fnfe.printStackTrace();
+                    }
+                    catch (IOException ioe)
+                    {
+                        ioe.printStackTrace();
+                    }
+                    trial.setImageBitmap(thumbnail);
+                    break;
             }
         } else{
             Toast.makeText(CreateActivity.this, "Please select the file", Toast.LENGTH_LONG).show();
