@@ -45,23 +45,15 @@ public class introActivity extends AppCompatActivity {
         buttonOnboardingAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(onboardingViewPager.getCurrentItem()+1 < onboardingAdapter.getItemCount()){
-                    onboardingViewPager.setCurrentItem(onboardingViewPager.getCurrentItem()+1);
+                if (onboardingViewPager.getCurrentItem() + 1 < onboardingAdapter.getItemCount()) {
+                    onboardingViewPager.setCurrentItem(onboardingViewPager.getCurrentItem() + 1);
                 }
-                else {
-                    FirebaseAuth mAuth=FirebaseAuth.getInstance();
-                    FirebaseUser mUser=mAuth.getCurrentUser();
-                    if(mUser!=null){
-                        Intent homeIntent=new Intent(introActivity.this,MainActivity.class);
-                        startActivity(homeIntent);
-                        finish();
-                    }
-                    else{
-                        Intent homeIntent=new Intent(introActivity.this,LoginActivity.class);
-                        startActivity(homeIntent);
-                        finish();
-                    }
-                }
+
+                else{
+                    Intent homeIntent = new Intent(introActivity.this, LoginActivity.class);
+                    startActivity(homeIntent);
+                    finish();
+               }
 
             }
         });

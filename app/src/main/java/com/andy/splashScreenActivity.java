@@ -15,9 +15,21 @@ public class splashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent homeIntent=new Intent(splashScreenActivity.this,introActivity.class);
-        startActivity(homeIntent);
-        finish();
+//        Intent homeIntent=new Intent(splashScreenActivity.this,introActivity.class);
+//        startActivity(homeIntent);
+//        finish();
+        FirebaseAuth mAuth=FirebaseAuth.getInstance();
+        FirebaseUser mUser=mAuth.getCurrentUser();
+        if(mUser!=null){
+            Intent homeIntent=new Intent(splashScreenActivity.this,MainActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
+        else{
+            Intent homeIntent=new Intent(splashScreenActivity.this,introActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
 
 
     }
