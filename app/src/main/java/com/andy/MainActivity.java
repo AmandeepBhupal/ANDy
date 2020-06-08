@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     DatabaseReference current_userdb;
     Iterable<DataSnapshot> allTags;
     Set<String> tagSet;
+    static boolean statupApp = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         setContentView(R.layout.activity_main);
         doThis();
 
-        if (tagSet.isEmpty()){
+        if (FeedsFragment.feedsFragmentCalled()) {
+            loadFragment(new FeedsFragment());
+        } else if (tagSet.isEmpty()) {
             loadFragment(new SearchFragment());
         }
         //loading the default fragment
@@ -110,8 +113,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             Log.d("TAGS", tags);
         }
 
-        if(!tagSet.isEmpty()) {
+        if ((!tagSet.isEmpty() && statupApp == true) || (!tagSet.isEmpty() && FeedsFragment.feedsFragmentCalled())) {
             loadFragment(new FeedsFragment());
+            statupApp = false;
         }
     }
 
