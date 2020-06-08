@@ -354,35 +354,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     //capture image from camera
     private void attachFromCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, 69);
-            File pictureFile = null;
-            try {
-                pictureFile = getPictureFile();
-            } catch (IOException ex) {
-                Toast.makeText(CreateActivity.this, "PHOTO not created", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (pictureFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.andy", pictureFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(intent, 69);
-            }
-        }
+        startActivityForResult(intent, 69);
     }
-    public File getPictureFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        String pictureFile = "ANDy_" + timeStamp;
-        File storageDir = new File(Environment.getExternalStorageDirectory().toString(),"pictures");
-        storageDir.mkdirs();
-        File image = File.createTempFile(pictureFile, ".jpg", storageDir);
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-
-
 
     //attach pdf
     private void attachpdf() {
