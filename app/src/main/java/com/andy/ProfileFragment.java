@@ -270,13 +270,7 @@ public class ProfileFragment extends Fragment {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int which) {
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(title);
-                        reference.removeValue();
-                        DatabaseReference reference_topic = FirebaseDatabase.getInstance()
-                                .getReference()
-                                .child(title);
-
-
+                        getProfileTopicsData(reference.child(ConstantsKeyNames.DOCUMENTS_FIREBASE_KEY),title);
                         getTopicsData(topics_reference, title);
                         Toast.makeText(getContext(),"Deleted  " + title,Toast.LENGTH_LONG).show();
                         chipgroup.removeView(chip);
@@ -301,10 +295,28 @@ public class ProfileFragment extends Fragment {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             DataSnapshot document_snapshot = ds.child(ConstantsKeyNames.DOCUMENTS_FIREBASE_KEY);
                             if(document_snapshot.hasChild(title)){
-                                Log.e("sid123", title);
                                document_snapshot.child(title).getRef().removeValue();
                             }
                         }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(getActivity().getBaseContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.e(ConstantsKeyNames.ERROR_TAG, ConstantsKeyNames.NULL_VALUE_TAG);
+        }
+    }
+    private void getProfileTopicsData(DatabaseReference reference, final String title) {
+        if (reference != null) {
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        dataSnapshot.child(title).getRef().removeValue();
                     }
                 }
 
