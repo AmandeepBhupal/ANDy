@@ -1,9 +1,12 @@
 package com.andy;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -16,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -51,7 +55,7 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    DatabaseReference reference;
+    DatabaseReference reference, topics_reference;
     TextView name, email, tagsTextMessage,tagsDocumentMessage;
     ImageView profile_picture;
     ChipGroup userTopics, userDocument;
@@ -135,6 +139,7 @@ public class ProfileFragment extends Fragment {
                 .child(uID);
 
         getActivity().setTitle("User Profile");
+        topics_reference = FirebaseDatabase.getInstance().getReference().child(ConstantsKeyNames.DATA_FIREBASE_KEY);
 
        // Toast.makeText(getActivity().getApplicationContext(), "Profile ---", Toast.LENGTH_SHORT).show();
 
@@ -220,8 +225,9 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+    final List<String> userDocumentList = new ArrayList<>();
     public void setUserDocuments(DatabaseReference reference) {
-        final List<String> userDocumentList = new ArrayList<>();
+        //final List<String> userDocumentList = new ArrayList<>();
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -242,11 +248,86 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
-    private void addChip(String pItem, ChipGroup pChipGroup) {
-        Chip lChip = new Chip(getActivity());
+    private void addChip(final String pItem, final ChipGroup pChipGroup) {
+        final Chip lChip = new Chip(getActivity());
         lChip.setText(pItem);
         lChip.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         lChip.setChipBackgroundColor(getResources().getColorStateList(R.color.primary_light));
         pChipGroup.addView(lChip, pChipGroup.getChildCount() - 1);
+        lChip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog(pItem, pChipGroup, lChip);
+            }
+        });
+    }
+
+    private void alertDialog(final String title, final ChipGroup chipgroup, final Chip chip) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+//        final DataSnapshot dsTitle = dataSnapshot.child("title");
+        dialog.setMessage("You sure you want to delete " + title + "?");
+        dialog.setPositiveButton("Delete"  ,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        getProfileTopicsData(reference.child(ConstantsKeyNames.DOCUMENTS_FIREBASE_KEY),title);
+                        getTopicsData(topics_reference, title);
+                        Toast.makeText(getContext(),"Deleted  " + title,Toast.LENGTH_LONG).show();
+                        chipgroup.removeView(chip);
+                    }
+                });
+        dialog.setNegativeButton("cancel"  ,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getContext(),"cancel is clicked",Toast.LENGTH_LONG).show();
+            }
+        });
+        AlertDialog alertDialog = dialog.create();
+        alertDialog.show();
+    }
+
+    private void getTopicsData(DatabaseReference reference, final String title) {
+        if (reference != null) {
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            DataSnapshot document_snapshot = ds.child(ConstantsKeyNames.DOCUMENTS_FIREBASE_KEY);
+                            if(document_snapshot.hasChild(title)){
+                               document_snapshot.child(title).getRef().removeValue();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(getActivity().getBaseContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.e(ConstantsKeyNames.ERROR_TAG, ConstantsKeyNames.NULL_VALUE_TAG);
+        }
+    }
+    private void getProfileTopicsData(DatabaseReference reference, final String title) {
+        if (reference != null) {
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        dataSnapshot.child(title).getRef().removeValue();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(getActivity().getBaseContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.e(ConstantsKeyNames.ERROR_TAG, ConstantsKeyNames.NULL_VALUE_TAG);
+        }
     }
 }
+
