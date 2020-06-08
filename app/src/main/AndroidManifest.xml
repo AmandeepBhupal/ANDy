@@ -8,18 +8,22 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
+        android:name=".myApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".myApp"
-        android:requestLegacyExternalStorage="true">
+        android:theme="@style/AppTheme">
+        <activity android:name=".introActivity"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar">
+        </activity>
         <activity android:name=".FeedsWebViewActivity"
             android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".splashScreenActivity" android:theme="@style/Splash_screen">
+        <activity android:name=".splashScreenActivity"
+            android:theme="@style/Splash_screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,14 +34,9 @@
             android:name=".DocumentLinksListActivity"
             android:label="Document List"
             android:parentActivityName=".MainActivity"/>
-        <activity android:name=".MainActivity">
-
-        </activity>
+        <activity android:name=".MainActivity"></activity>
         <activity android:name=".forgotPasswordActivity" />
         <activity android:name=".LoginActivity"/>
-
-
-
         <activity android:name=".RegisterActivity" />
         <activity android:name=".CreateActivity" android:parentActivityName=".MainActivity"/>
         <provider
