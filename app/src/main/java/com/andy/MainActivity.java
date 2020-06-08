@@ -55,19 +55,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         setContentView(R.layout.activity_main);
         doThis();
 
-        if (FeedsFragment.feedsFragmentCalled()) {
-            loadFragment(new FeedsFragment());
-        } else if (tagSet.isEmpty()) {
-            loadFragment(new SearchFragment());
-        }
-        //loading the default fragment
-        else {
-            loadFragment(new FeedsFragment());
-        }
+
 
         //getting bottom navigation view and attaching the listener
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
+
+        if (FeedsFragment.feedsFragmentCalled()) {
+            loadFragment(new FeedsFragment());
+            navigation.setSelectedItemId(R.id.feeds);
+        } else if (tagSet.isEmpty()) {
+            loadFragment(new SearchFragment());
+            navigation.setSelectedItemId(R.id.search);
+        }
+        //loading the default fragment
+        else {
+            loadFragment(new FeedsFragment());
+            navigation.setSelectedItemId(R.id.feeds);
+        }
 
     }
 
@@ -116,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if ((!tagSet.isEmpty() && statupApp == true) || (!tagSet.isEmpty() && FeedsFragment.feedsFragmentCalled())) {
             loadFragment(new FeedsFragment());
             statupApp = false;
+            BottomNavigationView navigation = findViewById(R.id.navigation);
+            navigation.setSelectedItemId(R.id.feeds);
         }
     }
 
