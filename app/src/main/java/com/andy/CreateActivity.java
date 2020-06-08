@@ -15,11 +15,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,6 +38,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -60,6 +63,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,7 +84,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     private ImageView trial;
     private EditText docTitle;
     private EditText docContent;
-    private Button attach,save,submit;
+    private Button attach, save, submit;
     private String timestamp = ServerValue.TIMESTAMP.toString();
     private String UID;
 
@@ -94,11 +98,14 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     DatabaseReference reference;
     GoogleSignInClient mGoogleSignInClient;
 
+    File pictureFile=null;
+
     //Progress dialog
     ProgressDialog progressDialog;
 
     //boolean to check if it is PDF or Gallery
     boolean decideAttachment;
+    boolean titleused;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +114,11 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //initializing objects
-        textTitle = (TextView)findViewById(R.id.textView);
-        docTitle = (EditText)findViewById(R.id.enterTitle);
-        docContent = (EditText)findViewById(R.id.textDesc);
-        attach = (Button)findViewById(R.id.attach);
-        submit = (Button)findViewById(R.id.submit);
+        textTitle = (TextView) findViewById(R.id.textView);
+        docTitle = (EditText) findViewById(R.id.enterTitle);
+        docContent = (EditText) findViewById(R.id.textDesc);
+        attach = (Button) findViewById(R.id.attach);
+        submit = (Button) findViewById(R.id.submit);
         trial = (ImageView) findViewById(R.id.trial);
 
         //return an object of FireBase Storage
@@ -142,8 +149,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         tagType.add("topic5");
 
         //Creating an adapter for spinner
-        ArrayAdapter<String> dataAdapterforAttach = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,docType);
-        ArrayAdapter<String> dataAdapterforTag = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,tagType);
+        ArrayAdapter<String> dataAdapterforAttach = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, docType);
+        ArrayAdapter<String> dataAdapterforTag = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tagType);
 
         //Drop down layout style - list view with radio button
         dataAdapterforAttach.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -160,19 +167,19 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
                 String value = String.valueOf(spinnerForAttach.getSelectedItem());//gets which item is selected
                 //if statement checks if permission is granted
-                if(ContextCompat.checkSelfPermission(CreateActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(CreateActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     if (value.equals("PDF")) {
                         decideAttachment = true;
                         attachpdf();
-                    } else if(value.equals("GALLERY")) {
+                    } else if (value.equals("GALLERY")) {
                         decideAttachment = false;
                         attachFromGallery();
-                    }else{
+                    } else {
                         askCameraPermissions();
                         attachFromCamera();
                     }
-                }else //else requests permissions and invokes another method which checks the request number
-                    ActivityCompat.requestPermissions(CreateActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},9);
+                } else //else requests permissions and invokes another method which checks the request number
+                    ActivityCompat.requestPermissions(CreateActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 9);
             }
         });
 
@@ -181,18 +188,14 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void onClick(View v) {
 
-                //you have to check other conditions as well,
-                //for now this code will help upload the pdf and img.
                 doThis();
                 String valueForAttach = String.valueOf(spinnerForAttach.getSelectedItem());
                 String valueForTags = String.valueOf(spinnerForTags.getSelectedItem());
-
                 if (!valueForTags.equals("Select Tag")) {
                     if (!docTitle.getText().toString().isEmpty()
-                            || !docContent.getText().toString().isEmpty()) {
-
+                            && !docContent.getText().toString().isEmpty()) {
                         if (externalFile != null)
-                            uploadFile(externalFile, valueForTags,valueForAttach);
+                            uploadFile(externalFile, valueForTags, valueForAttach);
                         else {
 
                             reference.child("Topics").child(valueForTags).child("documents").child(docTitle.getText().toString()).child("desc").setValue(docContent.getText().toString());
@@ -206,25 +209,25 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                                         public void onSuccess(Void aVoid) {
                                             Toast.makeText(CreateActivity.this, "No attachment added", Toast.LENGTH_SHORT).show();
                                             Toast.makeText(CreateActivity.this, "Data Succesfully added", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(CreateActivity.this,MainActivity.class);
+                                            Intent intent = new Intent(CreateActivity.this, MainActivity.class);
                                             startActivity(intent);
                                         }
                                     });
                         }
                     } else
                         Toast.makeText(CreateActivity.this, "Fields empty ", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(CreateActivity.this,"Select a topic",Toast.LENGTH_SHORT).show();
-                }
+                } else
+                    Toast.makeText(CreateActivity.this, "Select a topic", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+
     private void askCameraPermissions() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA);
-        }else{
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA);
+        } else {
             attachFromCamera();
         }
     }
@@ -265,9 +268,9 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         progressDialog.show();
         final StorageReference pdfRef;
 
-        final String filename = System.currentTimeMillis()+"";
+        final String filename = System.currentTimeMillis() + "";
 
-        if(valueForAttach == "PDF")
+        if (valueForAttach == "PDF")
             pdfRef = storageReference.child("pdf/" + filename);
         else
             pdfRef = storageReference.child("image/" + filename);
@@ -276,8 +279,8 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override // verify whether successfully uploaded
                     public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
-                        if(taskSnapshot.getMetadata()!=null){
-                            if (taskSnapshot.getMetadata().getReference()!=null){
+                        if (taskSnapshot.getMetadata() != null) {
+                            if (taskSnapshot.getMetadata().getReference() != null) {
                                 Task<Uri> path = taskSnapshot.getStorage().getDownloadUrl();
                                 path.addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
@@ -293,9 +296,9 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(CreateActivity.this,"File Successfully uploaded",Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(CreateActivity.this, "File Successfully uploaded", Toast.LENGTH_SHORT).show();
                                                         progressDialog.dismiss();
-                                                        Intent intent = new Intent(CreateActivity.this,MainActivity.class);
+                                                        Intent intent = new Intent(CreateActivity.this, MainActivity.class);
                                                         startActivity(intent);
                                                     }
                                                 });
@@ -307,7 +310,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                 }).addOnFailureListener(new OnFailureListener() {
             @Override //checks whether failed to upload
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CreateActivity.this,"Not successful upload",Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateActivity.this, "Not successful upload", Toast.LENGTH_SHORT).show();
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override //provides the progress of upload
@@ -315,7 +318,7 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
 
                 //track the progress
                 //dividing the bytes transferred with the total size of the file into 100
-                int currentProgress =(int) (100*taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                int currentProgress = (int) (100 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                 progressDialog.setProgress(currentProgress);
 
             }
@@ -328,18 +331,18 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        if(requestCode==9&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
-            if(decideAttachment)
+        if (requestCode == 9 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (decideAttachment)
                 attachpdf();
             else
                 attachFromGallery();
-        }else
-            Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_LONG).show();
+        } else
+            Toast.makeText(CreateActivity.this, "Please provide permissions", Toast.LENGTH_LONG).show();
 
-        if(requestCode==REQUEST_CODE_CAMERA&&grantResults[1]==PackageManager.PERMISSION_GRANTED){
+        if (requestCode == REQUEST_CODE_CAMERA && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
             attachFromCamera();
-        }else
-            Toast.makeText(CreateActivity.this,"Please provide permissions",Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(CreateActivity.this, "Please provide permissions", Toast.LENGTH_SHORT).show();
     }
 
     //attach image from gallery
@@ -347,14 +350,37 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,90);
+        startActivityForResult(intent, 90);
     }
 
-       //capture image from camera
-    private void attachFromCamera(){
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent,69);
+    //capture image from camera
+    private void attachFromCamera() {
 
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, 69);
+            try {
+                pictureFile = getPictureFile();
+                Log.d("INFO",pictureFile.getAbsolutePath());
+            } catch (IOException ex) {
+                Toast.makeText(CreateActivity.this, "PHOTO not created", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (pictureFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, "com.andy.provider", pictureFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(intent, 69);
+            }
+        }
+    }
+    public File getPictureFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String pictureFile = "ANDy_" + timeStamp;
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(pictureFile, ".jpg", storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     //attach pdf
@@ -388,93 +414,54 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
                     break;
 
                 case 69:
-                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), thumbnail, "Title", null);
-                    externalFile = Uri.parse(path);
+//                    File imgFile = new File(currentPhotoPath);
+//                    externalFile = Uri.fromFile(imgFile);
+//                    if(imgFile.exists())
+//                        trial.setImageURI(Uri.fromFile(imgFile));
+                    Bitmap mybitmap = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
+                    trial.setImageBitmap(mybitmap);
+                    externalFile = Uri.fromFile(pictureFile);
+                    break;
 
-                    File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
 
-                    FileOutputStream fos;
 
-                    try
-                    {
-                        destination.createNewFile();
-                        fos = new FileOutputStream(destination);
-                        fos.write(bytes.toByteArray());
-                        fos.close();
-                    }
-                    catch (FileNotFoundException fnfe)
-                    {
-                        fnfe.printStackTrace();
-                    }
-                    catch (IOException ioe)
-                    {
-                        ioe.printStackTrace();
-                    }
-                    trial.setImageBitmap(thumbnail);
+
+//
+//                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+//                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//                    assert thumbnail != null;
+//                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+//                    String path = MediaStore.Images.Media.insertImage(getContentResolver(), thumbnail, String.valueOf(docTitle), null);
+//                    externalFile = Uri.parse(path);
+//
+//                    File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+//
+//                    FileOutputStream fos;
+//
+//                    try
+//                    {
+//                        destination.createNewFile();
+//                        fos = new FileOutputStream(destination);
+//                        fos.write(bytes.toByteArray());
+//                        fos.close();
+//                    }
+//                    catch (FileNotFoundException fnfe)
+//                    {
+//                        fnfe.printStackTrace();
+//                    }
+//                    catch (IOException ioe)
+//                    {
+//                        ioe.printStackTrace();
+//                    }
+//                    trial.setImageBitmap(thumbnail);
 
             }
         } else{
             Toast.makeText(CreateActivity.this, "Please select the file", Toast.LENGTH_LONG).show();
         }
 
-//            Bitmap image = (Bitmap)data.getExtras().get("data");
-//            trial.setImageBitmap(image);
-
-//            File f = new File(currentPhotoPath);
-//            Log.d("tag", "Absolute URL"+ Uri.fromFile(f));
-//
-//            Intent mediaScanIntent = new Intent (Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//            Uri contentUri = Uri.fromFile(f);
-//            mediaScanIntent.setData(contentUri);
-//            this.sendBroadcast(mediaScanIntent);
 
     }
-//    private File createImageFile() throws IOException{
-//        //timestamp to create filename
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".jpg",         /* suffix */
-//                storageDir      /* directory */
-//        );
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
-//        return image;
-//    }
-
-//    private void openCamera(){
-//        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(camera,69);
-//    }
-
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        // Ensure that there's a camera activity to handle the intent
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            // Create the File where the photo should go
-//            File photoFile = null;
-//            try {
-//                photoFile = createImageFile();
-//            } catch (IOException ex) {
-//                Toast.makeText(CreateActivity.this,"yaar kyu",Toast.LENGTH_SHORT).show();
-//            }
-//            // Continue only if the File was successfully created
-//            if (photoFile != null) {
-//                Uri photoURI = FileProvider.getUriForFile(this,
-//                        "com.example.android.fileprovider",
-//                        photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(takePictureIntent, 69);
-//            }
-//        }
-//    }
-//
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -487,4 +474,6 @@ public class CreateActivity extends AppCompatActivity implements AdapterView.OnI
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+
 }
