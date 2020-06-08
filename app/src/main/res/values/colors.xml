@@ -9,4 +9,9 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#7A7777</color>
     <color name="grey">#E5E5E5</color>
+<!--Onboarding cards-->
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#757575</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorOnboardingInactive">#27BCFC</color>
 </resources>
