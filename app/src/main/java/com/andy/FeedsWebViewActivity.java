@@ -1,8 +1,10 @@
 package com.andy;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -11,7 +13,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class FeedsWebViewActivity extends AppCompatActivity {
 
     WebView webView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class FeedsWebViewActivity extends AppCompatActivity {
 
         //Navigate to previous activity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         //Instantiate web view
         webView.setWebViewClient(new webViewClient());
@@ -54,7 +56,6 @@ public class FeedsWebViewActivity extends AppCompatActivity {
         if (loadData) {
             webView.loadData(url, "text/html; charset=utf-8", "utf-8");
         }
-
 
     }
 

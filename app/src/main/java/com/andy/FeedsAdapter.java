@@ -186,7 +186,7 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.ViewHolder> 
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         DataSnapshot dsLike = dataSnapshot.child("like");
                         if (dsLike != null) {
-                            if (dsLike.child(dsTitle.getValue().toString()) != null) {
+                            if ((dsTitle.getValue() != null) && dsLike.child(dsTitle.getValue().toString()) != null) {
                                 String status = "";
                                 if (dsLike.child(dsTitle.getValue().toString()).getValue() != null) {
                                     status = dsLike.child(dsTitle.getValue().toString()).getValue().toString();

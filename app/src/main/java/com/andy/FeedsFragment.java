@@ -64,10 +64,19 @@ public class FeedsFragment extends Fragment {
     RecyclerView recyclerView;
     Iterable<DataSnapshot> allTags;
     FloatingActionButton fab;
+    private static boolean feedsFragmentCalled = false;
 
 
     public FeedsFragment() {
         // Required empty public constructor
+    }
+
+    public static boolean feedsFragmentCalled() {
+        return feedsFragmentCalled;
+    }
+
+    public static void feedsFragmentCalledReset() {
+        feedsFragmentCalled = false;
     }
 
     /**
@@ -91,12 +100,20 @@ public class FeedsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        feedsFragmentCalled = true;
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
+    @Override
+    public void onResume() {
+        feedsFragmentCalled = true;
+        Log.i("FEEDS FRAGMENT ", "FEEDS FRAGMENT ON RESUME");
+        super.onResume();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
